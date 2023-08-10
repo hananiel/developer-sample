@@ -12,10 +12,11 @@ namespace DeveloperSample.Syncing
         public List<string> InitializeList(IEnumerable<string> items)
         {
             var bag = new ConcurrentBag<string>();
-            Parallel.ForEach(items, async i =>
+            Parallel.ForEach(items, i =>
             {
-                var r = await Task.Run(() => i).ConfigureAwait(false);
-                bag.Add(r);
+                //var r = await Task.Run(() => i).ConfigureAwait(false);
+                //bag.Add(r);
+                bag.Add(i);
             });
             var list = bag.ToList();
             return list;
@@ -23,18 +24,29 @@ namespace DeveloperSample.Syncing
 
         public Dictionary<int, string> InitializeDictionary(Func<int, string> getItem)
         {
+            //var itemsToInitialize = Enumerable.Range(0, 100).ToList();
+            //var concurrentDictionary = new ConcurrentDictionary<int, string>();
+            //Parallel.ForEach(itemsToInitialize, new ParallelOptions { MaxDegreeOfParallelism = 3 }, item => {
+            //    concurrentDictionary.AddOrUpdate(item, getItem, (_, s) => s);
+            //});
+            //return concurrentDictionary.ToDictionary(kv => kv.Key, kv => kv.Value);
+
+            int numberOfThreads = 3;
+            int dictionaryLength = 100;
+            int numberPerEntry = (int)Math.Ceiling((decimal)dictionaryLength / (decimal)numberOfThreads);
+
             var itemsToInitialize = Enumerable.Range(0, 100).ToList();
 
             var concurrentDictionary = new ConcurrentDictionary<int, string>();
             var threads = Enumerable.Range(0, 3)
                 .Select(i => new Thread(() => {
-                    foreach (var item in itemsToInitialize)
+                   
+                    foreach (var item in itemsToInitialize.Skip(i*numberPerEntry).Take(numberPerEntry))
                     {
                         concurrentDictionary.AddOrUpdate(item, getItem, (_, s) => s);
                     }
                 }))
                 .ToList();
-
             foreach (var thread in threads)
             {
                 thread.Start();
@@ -43,8 +55,8 @@ namespace DeveloperSample.Syncing
             {
                 thread.Join();
             }
-
             return concurrentDictionary.ToDictionary(kv => kv.Key, kv => kv.Value);
+         
         }
     }
 }
