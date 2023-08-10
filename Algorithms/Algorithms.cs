@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 
 namespace DeveloperSample.Algorithms
 {
@@ -21,6 +22,15 @@ namespace DeveloperSample.Algorithms
             return returnValue;
         }
 
-        public static string FormatSeparators(params string[] items) => throw new NotImplementedException();
+        public static string FormatSeparators(params string[] items)
+        {
+            //if items is a single array no list needed
+            if (items.Length == 1)
+                return items[0];
+            //always have an and when items is greater than 1
+            //take all items except the last one ex a,b should be a; a,b,c should be a,b
+            //then append final item with an and at the beggining ex a,b should be 'a and b'
+            return items.Take(items.Length - 1).Aggregate((a, b) => a + ", " + b) + " and " + items[items.Length-1];
+        }
     }
 }

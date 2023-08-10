@@ -15,10 +15,13 @@ namespace DeveloperSample.Algorithms
             Assert.Equal(3628800, Algorithms.GetFactorial(10));
         }
 
-        [Fact(Skip="Not implemented")]
+        [Fact]
         public void CanFormatSeparators()
         {
+            Assert.Equal("a", Algorithms.FormatSeparators("a"));
+            Assert.Equal("a and b", Algorithms.FormatSeparators("a", "b"));
             Assert.Equal("a, b and c", Algorithms.FormatSeparators("a", "b", "c"));
+            Assert.Equal("a, b, c and d", Algorithms.FormatSeparators("a", "b", "c", "d"));
         }
     }
 }
