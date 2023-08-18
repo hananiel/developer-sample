@@ -1,27 +1,40 @@
+using System;
 using Xunit;
 
 namespace DeveloperSample.Algorithms
 {
     public class AlgorithmTest
     {
-        [Fact]
-        public void CanGetFactorial()
+        [Theory]
+        [InlineData(1, 0)]
+        [InlineData(1, 1)]
+        [InlineData(2, 2)]
+        [InlineData(6, 3)]
+        [InlineData(24, 4)]
+        [InlineData(120, 5)]
+        [InlineData(3628800, 10)]
+
+        public void CanGetFactorial(int expected,int factorial)
         {
-            Assert.Equal(1, Algorithms.GetFactorial(1));
-            Assert.Equal(2, Algorithms.GetFactorial(2));
-            Assert.Equal(6, Algorithms.GetFactorial(3));
-            Assert.Equal(24, Algorithms.GetFactorial(4));
-            Assert.Equal(120, Algorithms.GetFactorial(5));
-            Assert.Equal(3628800, Algorithms.GetFactorial(10));
+            Assert.Equal(expected, Algorithms.GetFactorial(factorial));
+
         }
 
         [Fact]
-        public void CanFormatSeparators()
+        public void NegativeFactorial()
         {
-            Assert.Equal("a", Algorithms.FormatSeparators("a"));
-            Assert.Equal("a and b", Algorithms.FormatSeparators("a", "b"));
-            Assert.Equal("a, b and c", Algorithms.FormatSeparators("a", "b", "c"));
-            Assert.Equal("a, b, c and d", Algorithms.FormatSeparators("a", "b", "c", "d"));
+            Assert.Throws<ArgumentException>(()=> Algorithms.GetFactorial(-5));
+           
+        }
+        [Theory]
+        [InlineData("a", new string[] {"a" })]
+        [InlineData("a and b", new string[] { "a", "b" })]
+        [InlineData("a, b and c", new string[] { "a", "b", "c" })]
+        [InlineData("a, b, c and d", new string[] { "a", "b", "c", "d" })]
+        public void CanFormatSeparators(string output, string[] input)
+        {
+            Assert.Equal(output, Algorithms.FormatSeparators(input));
+
         }
     }
 }
