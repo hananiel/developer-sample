@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace DeveloperSample.Syncing
@@ -7,11 +8,11 @@ namespace DeveloperSample.Syncing
     public class SyncTest
     {
         [Fact]
-        public void CanInitializeCollection()
+        public async Task CanInitializeCollection()
         {
             var debug = new SyncDebug();
             var items = new List<string> { "one", "two" };
-            var result = debug.InitializeList(items);
+            var result = await debug.InitializeListAsync(items);
             Assert.Equal(items.Count, result.Count);
         }
 
