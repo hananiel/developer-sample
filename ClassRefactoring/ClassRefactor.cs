@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace DeveloperSample.ClassRefactoring
 {
@@ -14,43 +15,56 @@ namespace DeveloperSample.ClassRefactoring
 
     public class SwallowFactory
     {
-        public Swallow GetSwallow(SwallowType swallowType) => new Swallow(swallowType);
+        // Refactored to interface which will allow easy addition of new types when extending code
+        public ISwallow GetSwallow(SwallowType swallowType)
+        {
+            switch (swallowType)
+            {
+                case SwallowType.European: return new EuropeanSwallow();
+                case SwallowType.African: return new AfricanSwallow();
+                default: throw new ArgumentOutOfRangeException(nameof(swallowType));
+            }
+        }
     }
 
-    public class Swallow
+    public interface ISwallow
     {
-        public SwallowType Type { get; }
-        public SwallowLoad Load { get; private set; }
+        public void ApplyLoad(SwallowLoad swallowLoad);
+        public double GetAirspeedVelocity();
+    }
 
-        public Swallow(SwallowType swallowType)
-        {
-            Type = swallowType;
-        }
+    // Moved common functionality to an abstract class
+    public abstract class AbstractSwallow
+    {
+        protected SwallowLoad Load;
 
-        public void ApplyLoad(SwallowLoad load)
+        public void ApplyLoad(SwallowLoad swallowLoad)
         {
-            Load = load;
+            this.Load = swallowLoad;
         }
+    }
 
-        public double GetAirspeedVelocity()
-        {
-            if (Type == SwallowType.African && Load == SwallowLoad.None)
+    // Refactored to separate classes since the Type of the swallow lines up with its own type
+    public class AfricanSwallow : AbstractSwallow, ISwallow
+    {
+        public double GetAirspeedVelocity() => 
+            // Refactored to a switch expression 
+            Load switch
             {
-                return 22;
-            }
-            if (Type == SwallowType.African && Load == SwallowLoad.Coconut)
+                SwallowLoad.None => 22,
+                SwallowLoad.Coconut => (double)18,
+                _ => throw new InvalidOperationException($"Unknown type of {Load}"),
+            };
+        
+    }
+    public class EuropeanSwallow : AbstractSwallow, ISwallow
+    {
+        public double GetAirspeedVelocity() =>
+            Load switch
             {
-                return 18;
-            }
-            if (Type == SwallowType.European && Load == SwallowLoad.None)
-            {
-                return 20;
-            }
-            if (Type == SwallowType.European && Load == SwallowLoad.Coconut)
-            {
-                return 16;
-            }
-            throw new InvalidOperationException();
-        }
+                SwallowLoad.None => 20,
+                SwallowLoad.Coconut => (double)16,
+                _ => throw new InvalidOperationException($"Unknown type of {Load}"),
+            };
     }
 }

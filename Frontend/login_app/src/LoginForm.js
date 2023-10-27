@@ -6,8 +6,8 @@ const LoginForm = (props) => {
 		event.preventDefault();
 
 		props.onSubmit({
-			login: undefined,
-			password: undefined,
+			login: event.target.form.elements.name.value,
+			password: event.target.form.elements.password.value,
 		});
 	}
 
